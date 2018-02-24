@@ -17,7 +17,7 @@
   "license": "MIT",
   "scripts": {
     "analyze": "esca-scripts analyze --input './src/gatsby-browser.js'",
-    "build": "esca-scripts build --input src --output dist --multiple --react --babel",
+    "build": "esca-scripts build --input src --output . --multiple --react --babel",
     "prepublishOnly": "npm run build",
     "reset": "esca-scripts reset",
     "test": "npm run build && esca-scripts test",
