@@ -4,13 +4,15 @@
   "keywords": [
     "gatsby",
     "plugin",
-    "boilerplate"
+    "source",
+    "john",
+    "deere"
   ],
-  "main": "dist/index.js",
-  "author": "Kennedy Rose <krose@escaladesports.com>",
+  "main": "gatsby-node.js",
+  "author": "Kennedy Rose <kennedy@kennedyrose.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/escaladesports/gatsby-plugin-boilerplate.git"
+    "url": "https://github.com/kennedyrose/gatsby-plugin-source-john-deere.git"
   },
   "license": "MIT",
   "scripts": {
@@ -19,13 +21,17 @@
     "prepublishOnly": "npm run build",
     "reset": "esca-scripts reset",
     "test": "npm run build && esca-scripts test",
-    "travis": "opn https://travis-ci.org/escaladesports/gatsby-plugin-boilerplate/branches"
+    "travis": "opn https://travis-ci.org/kennedyrose/gatsby-plugin-source-john-deere/branches"
   },
   "devDependencies": {
     "esca-scripts": "^0.14.1",
     "opn-cli": "^3.1.0"
   },
   "dependencies": {
-    "babel-runtime": "^6.26.0"
+    "babel-runtime": "^6.26.0",
+    "crypto": "^1.0.1",
+    "fetch-retry": "^1.1.1",
+    "promise-sequence": "^0.3.1",
+    "xml2js": "^0.4.19"
   }
 }
