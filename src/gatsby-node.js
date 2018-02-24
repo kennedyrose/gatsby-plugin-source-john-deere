@@ -1,14 +1,14 @@
-const fetch = require('fetch-retry')
-const crypto = require('crypto')
-const xml2js = require('xml2js')
-const sequence = require('promise-sequence')
+import fetch from 'fetch-retry'
+import crypto from 'crypto'
+import xml2js from 'xml2js'
+import sequence from 'promise-sequence'
 
 async function fetchSchema(options) {
 	let data = await fetch(options.taxonomyUrl, {
 		method: 'GET',
 		headers: options.headers,
 	})
-	console.log(`Fetched Deere taxonomy...`)
+	options.log(`Fetched Deere taxonomy...`)
 	data = await data.text()
 	data = await parseString(data)
 	return data
@@ -72,7 +72,7 @@ async function fetchData(url, options) {
 		})
 	}
 	catch (err) {
-		console.log(`Error fetching Deere data ${url}`)
+		options.log(`Error fetching Deere data ${url}`)
 		//console.error(err)
 		return
 	}
@@ -81,12 +81,12 @@ async function fetchData(url, options) {
 			data = await data.json()
 		}
 		catch (err) {
-			console.log(`Error parsing Deere JSON ${url}`)
+			options.log(`Error parsing Deere JSON ${url}`)
 			//console.error(err)
 			return
 		}
 	}
-	console.log('Succeeded fetching Deere JSON')
+	options.log('Succeeded fetching Deere JSON')
 	if (options.mutate) {
 		data = options.mutate(data)
 	}
@@ -95,9 +95,6 @@ async function fetchData(url, options) {
 	data = removeNull(data)
 	delete data.Page['table']
 
-
-
-	//console.log(JSON.stringify(data, null, 3))
 	return Object.assign({
 		id: url,
 		parent: null,
@@ -113,21 +110,25 @@ async function fetchData(url, options) {
 	}, data)
 }
 
-exports.sourceNodes = async ({ boundActionCreators }, options) => {
+export async function sourceNodes({ boundActionCreators }, options){
 
-	options = Object.assign({
+	options = {
 		urls: [],
 		prepend: 'https://www.deere.com',
 		append: 'index.json',
 		headers: {},
-		internalType: 'ApiContent',
+		internalType: 'DeereContent',
 		productOnly: true,
 		taxonomyUrl: `https://www.deere.com/en/us-en.taxonomy`,
-	}, options)
+		verbose: false,
+		...options
+	}
+
+	options.log = options.verbose ? console.log : function(){}
 
 	const { createNode } = boundActionCreators
 
-	console.log('Fetching Deere taxonomy...')
+	options.log('Fetching Deere taxonomy...')
 	const taxonomy = await fetchSchema(options)
 	let urls
 	if (options.productOnly) {
@@ -136,30 +137,21 @@ exports.sourceNodes = async ({ boundActionCreators }, options) => {
 	else {
 		urls = getUrls(taxonomy)
 	}
-	console.log(`Found ${urls.length} Deere URLs...`)
-	//urls.length = 203
-
-	/*
-	urls = [
-		urls[201],
-		urls[202],
-	]
-	*/
+	options.log(`Found ${urls.length} Deere URLs...`)
 
 	const promises = urls.map(url => {
 		return fetchData(url, options)
 	})
-	console.log(`Fetching ${urls.length} Deere URLs...`)
+	options.log(`Fetching ${urls.length} Deere URLs...`)
 	let data = await sequence(promises)
 
-	console.log(`Creating Deere nodes...`)
+	options.log(`Creating Deere nodes...`)
 	data.forEach((datum, key) => {
 		if (typeof datum === 'object') {
 			createNode(datum)
 		}
 	})
 
-	console.log(`Created Deere nodes.`)
+	options.log(`Created Deere nodes.`)
 
-	return
 }
