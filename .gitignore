@@ -27,7 +27,8 @@ dist-modules
 _optimize
 .babelrc
 .postcssrc
-./*.js
+/*.js
+/*.js.map
 
 # Temporary
 temp
